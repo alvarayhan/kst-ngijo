@@ -1,0 +1,70 @@
+<?php
+
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProductionDataController;
+use App\Http\Controllers\Api\ResearchDataController;
+use App\Http\Controllers\Api\SustainabilityDataController;
+use App\Http\Controllers\Api\ValidationController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PublicController;
+use Illuminate\Support\Facades\Route;
+
+// Public endpoints
+Route::prefix('external')->group(function () {
+    Route::get('landing-page/info', [PublicController::class, 'getInfo']);
+    Route::get('landing-page/stats', [PublicController::class, 'getStatistics']);
+    Route::get('landing-page/research-highlights', [PublicController::class, 'getResearchHighlights']);
+    Route::get('landing-page/tenants', [PublicController::class, 'getTenantSpotlight']);
+    Route::get('landing-page/latest-activities', [PublicController::class, 'getLatestActivities']);
+    
+    // Public dashboard routes (read-only for public users)
+    Route::get('dashboard/overview', [DashboardController::class, 'publicOverview']);
+    Route::get('dashboard/production', [DashboardController::class, 'publicProduction']);
+    Route::get('dashboard/research', [DashboardController::class, 'publicResearch']);
+    Route::get('dashboard/sustainability', [DashboardController::class, 'publicSustainability']);
+    Route::get('dashboard/executive', [DashboardController::class, 'publicExecutive']);
+});
+
+// Authentication endpoints (public)
+Route::prefix('auth')->group(function () {
+    Route::post('signup', [AuthController::class, 'signup']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
+    Route::post('refresh', [AuthController::class, 'refresh'])->middleware('auth:api');
+    Route::get('me', [AuthController::class, 'me'])->middleware('auth:api');
+});
+
+// Protected API endpoints
+Route::middleware('auth:api')->group(function () {
+    Route::prefix('internal')->group(function () {
+        // Production Data routes
+        Route::get('production-data/my-submissions', [ProductionDataController::class, 'mySubmissions']);
+        Route::apiResource('production-data', ProductionDataController::class);
+
+        // Research Data routes
+        Route::post('research-data/{id}/outputs', [ResearchDataController::class, 'addOutput']);
+        Route::apiResource('research-data', ResearchDataController::class);
+
+        // Sustainability Data routes
+        Route::apiResource('sustainability-data', SustainabilityDataController::class);
+
+        // Validation routes (Admin only)
+        Route::middleware('role:admin')->group(function () {
+            Route::get('validations/pending', [ValidationController::class, 'pending']);
+            Route::patch('validations/{id}/approve', [ValidationController::class, 'approve']);
+            Route::patch('validations/{id}/reject', [ValidationController::class, 'reject']);
+            
+            // User management
+            Route::apiResource('users', UserController::class);
+        });
+
+        // Notification routes
+        Route::get('notifications', [NotificationController::class, 'index']);
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::get('notifications/{id}', [NotificationController::class, 'show']);
+        Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    });
+});
