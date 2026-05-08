@@ -117,13 +117,13 @@ class AuthController extends Controller
         }
 
         // Check if role already has a user
-        $existingUser = User::where('role_id', $role->id)->exists();
-        if ($existingUser) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Role ' . $request->role . ' already has a user. Only one user per role is allowed.'
-            ], 400);
-        }
+        // $existingUser = User::where('role_id', $role->id)->exists();
+        // if ($existingUser) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Role ' . $request->role . ' already has a user. Only one user per role is allowed.'
+        //     ], 400);
+        // }
 
         $user = User::create([
             'name' => $request->name,
