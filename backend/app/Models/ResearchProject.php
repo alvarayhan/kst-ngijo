@@ -14,7 +14,7 @@ class ResearchProject extends Model
     protected $fillable = [
         'title', 'description', 'start_date', 'end_date', 'status',
         'category', 'principal_investigator_id', 'created_by_user_id',
-        'budget', 'synced_at'
+        'budget', 'synced_at', 'trl_level'
     ];
 
     public function principalInvestigator()

@@ -50,6 +50,7 @@ class ResearchDataController extends Controller
             'principal_investigator_id' => 'required|exists:users,id',
             'budget' => 'nullable|integer|min:0',
             'collaborators' => 'nullable|array',
+            'trl_level' => 'nullable|integer|min:1|max:9',
         ]);
         
         $project = ResearchProject::create([
@@ -99,6 +100,7 @@ class ResearchDataController extends Controller
             'end_date' => 'nullable|date|after:start_date',
             'status' => 'in:planning,active,completed,paused',
             'budget' => 'nullable|integer|min:0',
+            'trl_level' => 'nullable|integer|min:1|max:9',
         ]);
         
         $project->update($validated);
