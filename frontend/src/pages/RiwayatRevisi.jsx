@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from './DashboardLayout';
 import { useApiWithAuth } from '../hooks/useApiWithAuth';
+import { useAuth } from '../context/AuthContext';
 import { ClipboardList, Clock, XCircle, CheckCircle, Search, Loader2, AlertCircle } from 'lucide-react';
 
 const STATUS_CONFIG = {
@@ -11,6 +12,7 @@ const STATUS_CONFIG = {
 
 export default function RiwayatRevisi() {
   const { fetchWithAuth } = useApiWithAuth();
+  const { user } = useAuth();
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,10 +26,8 @@ export default function RiwayatRevisi() {
       const json = await fetchWithAuth('/internal/sustainability-data');
       if (!json) return;
 
-      // Note: filter by user ID masih perlu, ambil dari AuthContext
-      const { user } = JSON.parse(localStorage.getItem('kst_user') || '{}');
       const myData = (json.real_time_sensor_feed || []).filter(
-        (d) => d.created_by_user_id === user?.id
+        (d) => Number(d.created_by_user_id) === Number(user?.id)
       );
       setDataList(myData);
     } catch (err) {

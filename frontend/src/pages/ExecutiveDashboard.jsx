@@ -21,37 +21,6 @@ L.Icon.Default.mergeOptions({
 });
 const KST_COORDS = [-7.9151283496690885, 112.61328022988705];
 
-// Chart data tetap mock dulu — backend gak ada endpoint trend tahunan
-const trendDataTahunan = [
-  { year: '2019', output: 18, dampak: 12 },
-  { year: '2020', output: 22, dampak: 15 },
-  { year: '2021', output: 28, dampak: 20 },
-  { year: '2022', output: 35, dampak: 24 },
-  { year: '2023', output: 52, dampak: 38 },
-  { year: '2024', output: 68, dampak: 55 },
-];
-
-const trendDataBulanan = [
-  { year: 'Jan', output: 5, dampak: 3 },
-  { year: 'Feb', output: 7, dampak: 4 },
-  { year: 'Mar', output: 6, dampak: 5 },
-  { year: 'Apr', output: 9, dampak: 6 },
-  { year: 'Mei', output: 8, dampak: 7 },
-  { year: 'Jun', output: 11, dampak: 9 },
-  { year: 'Jul', output: 10, dampak: 8 },
-  { year: 'Agu', output: 12, dampak: 10 },
-  { year: 'Sep', output: 14, dampak: 11 },
-  { year: 'Okt', output: 13, dampak: 12 },
-  { year: 'Nov', output: 15, dampak: 13 },
-  { year: 'Des', output: 16, dampak: 14 },
-];
-
-const fasilitasData = [
-  { name: 'Laboratorium Mikrobiologi Lanjutan', value: 94, color: '#1e3a5f' },
-  { name: 'Area Prototipe Energi Terbarukan', value: 62, color: '#b45309' },
-  { name: 'Area Manufaktur Pintar', value: 88, color: '#1e40af' },
-];
-
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
@@ -69,6 +38,9 @@ function CustomTooltip({ active, payload, label }) {
 export default function ExecutiveDashboard() {
   const [trendMode, setTrendMode] = useState('tahun');
   const [kpis, setKpis] = useState(null);
+  const [trendTahunan, setTrendTahunan] = useState([]);
+  const [trendBulanan, setTrendBulanan] = useState([]);
+  const [fasilitasData, setFasilitasData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { fetchWithAuth } = useApiWithAuth();
 
@@ -76,13 +48,19 @@ export default function ExecutiveDashboard() {
     const load = async () => {
       setLoading(true);
       try {
-        // Hit public executive endpoint — gak perlu token
         const res = await fetch('http://localhost/api/external/dashboard/executive');
         const json = await res.json();
-        if (json.success) setKpis(json.data.kpis);
+        if (json.success) {
+          setKpis(json.data.kpis);
+          setTrendTahunan(json.data.trend_tahunan || []);
+          setTrendBulanan(json.data.trend_bulanan || []);
+          setFasilitasData(json.data.fasilitas || []);
+        }
       } catch (_) {
-        // Ganti angka mockup ini jadi 0 semua
         setKpis({ active_projects: 0, active_tenants: 0, total_visitors_ytd: 0, green_score: 0 });
+        setTrendTahunan([]);
+        setTrendBulanan([]);
+        setFasilitasData([]);
       } finally {
         setLoading(false);
       }
@@ -91,10 +69,9 @@ export default function ExecutiveDashboard() {
   }, []);
 
   const handleNavigate = (key) => console.log('Navigate to:', key);
-  const trendData = trendMode === 'tahun' ? trendDataTahunan : trendDataBulanan;
+  const trendData = trendMode === 'tahun' ? trendTahunan : trendBulanan;
 
-  // Stat cards pake data real dari API, sisanya fallback mock
-    const statsCards = [
+  const statsCards = [
     {
       label: 'Total Proyek Aktif',
       value: loading ? '...' : String(kpis?.active_projects ?? 0),
@@ -166,18 +143,25 @@ export default function ExecutiveDashboard() {
             <button onClick={() => setTrendMode('bulan')} className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${trendMode === 'bulan' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>Bulan</button>
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={trendData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={8}
-              formatter={(value) => <span className="text-xs text-gray-500 ml-1">{value}</span>} />
-            <Line type="monotone" dataKey="output" name="Output Penelitian" stroke="#166534" strokeWidth={2.5} dot={{ r: 3, fill: '#166534' }} activeDot={{ r: 5 }} />
-            <Line type="monotone" dataKey="dampak" name="Dampak Sitasi" stroke="#1e40af" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3, fill: '#1e40af' }} activeDot={{ r: 5 }} />
-          </LineChart>
-        </ResponsiveContainer>
+        
+        {trendData.length > 0 && trendData.some(d => d.output > 0 || d.dampak > 0) ? (
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={8}
+                formatter={(value) => <span className="text-xs text-gray-500 ml-1">{value}</span>} />
+              <Line type="monotone" dataKey="output" name="Output Penelitian" stroke="#166534" strokeWidth={2.5} dot={{ r: 3, fill: '#166534' }} activeDot={{ r: 5 }} />
+              <Line type="monotone" dataKey="dampak" name="Dampak Sitasi" stroke="#1e40af" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3, fill: '#1e40af' }} activeDot={{ r: 5 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[280px] flex items-center justify-center text-gray-400 text-sm border-2 border-dashed border-gray-100 rounded-xl">
+            Belum ada data trend untuk dirender.
+          </div>
+        )}
       </div>
 
       {/* Bottom Row */}
@@ -189,24 +173,28 @@ export default function ExecutiveDashboard() {
             <span className="text-xs text-gray-400">Bulan ini</span>
           </div>
           <div className="space-y-5">
-            {fasilitasData.map((item, idx) => (
-              <div key={idx}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm text-gray-700">{item.name}</span>
-                  <span className="text-sm font-bold text-gray-900">{item.value}%</span>
+            {fasilitasData.length > 0 ? (
+              fasilitasData.map((item, idx) => (
+                <div key={idx}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm text-gray-700">{item.name}</span>
+                    <span className="text-sm font-bold text-gray-900">{item.value}%</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
+                  </div>
                 </div>
-                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="py-6 text-center text-gray-400 text-sm">Belum ada data fasilitas.</div>
+            )}
           </div>
         </div>
 
         {/* Peta Kawasan */}
         <div className="bg-white rounded-xl border border-gray-100 p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Peta Kawasan Regional</h2>
-          <div className="w-full h-48 rounded-xl overflow-hidden mb-4 border border-gray-100">
+          <div className="w-full h-48 rounded-xl overflow-hidden mb-4 border border-gray-100 z-0 relative">
             <MapContainer
               center={KST_COORDS}
               zoom={15}
