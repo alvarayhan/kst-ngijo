@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,11 +11,19 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // Ini data master (wajib ada di prod/local)
         $this->call([
             RoleSeeder::class,
+            PermissionSeeder::class,
             UserSeeder::class,
             FacilitySeeder::class,
-            SustainabilityDataSeeder::class,
         ]);
+
+        // Ini data dummy (cuma jalan di local dev)
+        if (app()->environment('local')) {
+            $this->call([
+                SustainabilityDataSeeder::class,
+            ]);
+        }
     }
 }

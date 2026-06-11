@@ -64,6 +64,43 @@ export default function ResearchModule() {
   const [activeTab, setActiveTab] = useState('aktif');
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [showModal, setShowModal] = useState(false);
+  const [modalForm, setModalForm] = useState({
+    title: '',
+    category: '',
+    start_date: new Date().toISOString().split('T')[0],
+    budget: '',
+    description: '',
+    trl_level: 1,
+  });
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState(null);
+
+  const handleCreateProject = async (e) => {
+    e.preventDefault();
+    setModalLoading(true);
+    setModalError(null);
+    try {
+      const json = await fetchWithAuth('/internal/research-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...modalForm,
+          budget: modalForm.budget ? Number(modalForm.budget) : null,
+          trl_level: Number(modalForm.trl_level),
+          principal_investigator_id: 1, // sementara hardcode, nanti bisa dropdown user
+        }),
+      });
+      if (!json) return;
+      setShowModal(false);
+      setModalForm({ title: '', category: '', start_date: new Date().toISOString().split('T')[0], budget: '', description: '', trl_level: 1 });
+      fetchProjects(currentPage, searchQuery); // refresh table
+    } catch (err) {
+      setModalError(err.message);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
   const fetchProjects = async (page = 1, search = '') => {
     setLoading(true);
     setError(null);
@@ -412,40 +449,3 @@ export default function ResearchModule() {
     </DashboardLayout>
   );
 }
-
-const [showModal, setShowModal] = useState(false);
-const [modalForm, setModalForm] = useState({
-  title: '',
-  category: '',
-  start_date: new Date().toISOString().split('T')[0],
-  budget: '',
-  description: '',
-  trl_level: 1,
-});
-const [modalLoading, setModalLoading] = useState(false);
-const [modalError, setModalError] = useState(null);
-
-const handleCreateProject = async (e) => {
-  e.preventDefault();
-  setModalLoading(true);
-  setModalError(null);
-  try {
-    const json = await fetchWithAuth('/internal/research-data', {
-      method: 'POST',
-      body: JSON.stringify({
-        ...modalForm,
-        budget: modalForm.budget ? Number(modalForm.budget) : null,
-        trl_level: Number(modalForm.trl_level),
-        principal_investigator_id: 1, // sementara hardcode, nanti bisa dropdown user
-      }),
-    });
-    if (!json) return;
-    setShowModal(false);
-    setModalForm({ title: '', category: '', start_date: new Date().toISOString().split('T')[0], budget: '', description: '', trl_level: 1 });
-    fetchProjects(currentPage, searchQuery); // refresh table
-  } catch (err) {
-    setModalError(err.message);
-  } finally {
-    setModalLoading(false);
-  }
-};

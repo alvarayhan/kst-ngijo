@@ -6,8 +6,8 @@ import {
   Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import {
-  FileText, Award, Wifi, ShieldCheck,
-  TrendingUp, TrendingDown, ExternalLink, MapPin, Loader2
+  Archive, Handshake, Leaf, TrendingUp, TrendingDown, 
+  ExternalLink, MapPin, Loader2, BadgeCheck
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -19,7 +19,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
-const KST_COORDS = [-7.9306, 112.6017];
+const KST_COORDS = [-7.9151283496690885, 112.61328022988705];
 
 // Chart data tetap mock dulu — backend gak ada endpoint trend tahunan
 const trendDataTahunan = [
@@ -99,25 +99,25 @@ export default function ExecutiveDashboard() {
       label: 'Total Proyek Aktif',
       value: loading ? '...' : String(kpis?.active_projects ?? 142),
       change: '+12.5%', isUp: true,
-      icon: FileText, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-700',
+      icon: Archive, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-700',
     },
     {
       label: 'Total Paten',
       value: loading ? '...' : String(kpis?.total_visitors_ytd ?? 384),
       change: '+8.1%', isUp: true,
-      icon: Award, iconBg: 'bg-amber-50', iconColor: 'text-amber-700',
+      icon: BadgeCheck, iconBg: 'bg-amber-50', iconColor: 'text-amber-700',
     },
     {
       label: 'Mitra Industri',
       value: loading ? '...' : String(kpis?.active_tenants ?? 64),
       change: '-2.4%', isUp: false,
-      icon: Wifi, iconBg: 'bg-sky-50', iconColor: 'text-sky-700',
+      icon: Handshake, iconBg: 'bg-sky-50', iconColor: 'text-sky-700',
     },
     {
       label: 'Green Score',
       value: '92', suffix: '/100',
       change: '+4.2%', isUp: true,
-      icon: ShieldCheck, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-700',
+      icon: Leaf, iconBg: 'bg-emerald-700', iconColor: 'text-emerald-50',
     },
   ];
 
