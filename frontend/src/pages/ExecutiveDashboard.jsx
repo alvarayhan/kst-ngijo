@@ -48,7 +48,7 @@ export default function ExecutiveDashboard() {
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost/api/external/dashboard/executive');
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost/api'}/external/dashboard/executive`);
         const json = await res.json();
         if (json.success) {
           setKpis(json.data.kpis);
