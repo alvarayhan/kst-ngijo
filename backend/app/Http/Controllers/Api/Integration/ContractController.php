@@ -21,14 +21,14 @@ class ContractController extends Controller
             'version' => '0.0.1',
             'contract' => [
                 [
-                    'name' => 'Ringkasan KST Ngijo',
-                    'path' => '/ringkasan/',
+                    'name' => 'Tracker Inovasi KST Ngijo',
+                    'path' => '/tracker-inovasi/',
                     'iconUri' => null,
-                    'description' => 'Data ringkasan KST Ngijo',
+                    'description' => 'Metrik utama Tracker Inovasi KST Ngijo',
                     'items' => [
                         [
                             'name' => 'Total Projek Aktif',
-                            'path' => '/ringkasan/projek-aktif',
+                            'path' => '/tracker-inovasi/projek-aktif',
                             'code' => '1f0ca001-0001-6000-8000-00000000bb01',
                             'iconUri' => null,
                             'description' => 'Jumlah penelitian yang sedang aktif di KST Ngijo',
@@ -41,7 +41,7 @@ class ContractController extends Controller
                         ],
                         [
                             'name' => 'Rata-rata Skor TRL',
-                            'path' => '/ringkasan/avg-trl',
+                            'path' => '/tracker-inovasi/avg-trl',
                             'code' => '1f0ca001-0001-6000-8000-00000000bb02',
                             'iconUri' => null,
                             'description' => 'Rata-rata Technology Readiness Level dari seluruh penelitian aktif',
@@ -53,14 +53,100 @@ class ContractController extends Controller
                             'params' => []
                         ],
                         [
+                            'name' => 'Paten Tertunda',
+                            'path' => '/tracker-inovasi/paten-tertunda',
+                            'code' => '1f0ca001-0001-6000-8000-00000000bb05',
+                            'iconUri' => null,
+                            'description' => 'Jumlah paten yang diajukan / tertunda',
+                            'operations' => ['read'],
+                            'dataType' => [
+                                'typeName' => 'number',
+                                'unit' => null
+                            ],
+                            'params' => []
+                        ],
+                        [
+                            'name' => 'Kolaborasi',
+                            'path' => '/tracker-inovasi/kolaborasi',
+                            'code' => '1f0ca001-0001-6000-8000-00000000bb06',
+                            'iconUri' => null,
+                            'description' => 'Jumlah mitra kolaborasi dalam riset',
+                            'operations' => ['read'],
+                            'dataType' => [
+                                'typeName' => 'number',
+                                'unit' => null
+                            ],
+                            'params' => []
+                        ]
+                    ]
+                ],
+                [
+                    'name' => 'Keberlanjutan KST Ngijo',
+                    'path' => '/keberlanjutan/',
+                    'iconUri' => null,
+                    'description' => 'Metrik utama keberlanjutan KST Ngijo',
+                    'items' => [
+                        [
                             'name' => 'Total Energi Terbarukan',
-                            'path' => '/ringkasan/energi-terbarukan',
+                            'path' => '/keberlanjutan/energi-terbarukan',
                             'code' => '1f0ca001-0001-6000-8000-00000000bb03',
                             'iconUri' => null,
                             'description' => 'Total produksi energi terbarukan yang tercatat di KST Ngijo',
                             'operations' => ['read'],
                             'dataType' => [
                                 'typeName' => 'number',
+                                'unit' => 'MWh'
+                            ],
+                            'params' => []
+                        ],
+                        [
+                            'name' => 'Green Performance',
+                            'path' => '/keberlanjutan/green-performance',
+                            'code' => '1f0ca001-0001-6000-8000-00000000bb07',
+                            'iconUri' => null,
+                            'description' => 'Skor rata-rata target ketercapaian green performance',
+                            'operations' => ['read'],
+                            'dataType' => [
+                                'typeName' => 'number',
+                                'unit' => '%'
+                            ],
+                            'params' => []
+                        ],
+                        [
+                            'name' => 'Siklus Air (Daur Ulang)',
+                            'path' => '/keberlanjutan/air-daur-ulang',
+                            'code' => '1f0ca001-0001-6000-8000-00000000bb08',
+                            'iconUri' => null,
+                            'description' => 'Total volume air daur ulang',
+                            'operations' => ['read'],
+                            'dataType' => [
+                                'typeName' => 'number',
+                                'unit' => 'L'
+                            ],
+                            'params' => []
+                        ],
+                        [
+                            'name' => 'Metrik Limbah',
+                            'path' => '/keberlanjutan/metrik-limbah',
+                            'code' => '1f0ca001-0001-6000-8000-00000000bb09',
+                            'iconUri' => null,
+                            'description' => 'Metrik pemrosesan limbah padat',
+                            'operations' => ['read'],
+                            'dataType' => [
+                                'typeName' => 'number',
+                                'unit' => 'ton'
+                            ],
+                            'params' => []
+                        ],
+                        [
+                            'name' => 'Dinamika Energi',
+                            'path' => '/keberlanjutan/dinamika-energi',
+                            'code' => '1f0ca001-0001-6000-8000-00000000bc01',
+                            'iconUri' => null,
+                            'description' => 'Dinamika energi secara runtun waktu',
+                            'operations' => ['read'],
+                            'dataType' => [
+                                'typeName' => 'timeSeries',
                                 'unit' => 'MWh'
                             ],
                             'params' => []
@@ -109,6 +195,45 @@ class ContractController extends Controller
                             [
                                 'colIdx' => 4,
                                 'name' => 'Mulai',
+                                'dataType' => ['typeName' => 'datetime']
+                            ]
+                        ]
+                    ],
+                    'params' => []
+                ],
+                [
+                    'name' => 'Real Time Sensor Feed',
+                    'path' => '/keberlanjutan/sensor-feed',
+                    'code' => '1f0ca001-0001-6000-8000-00000000bc02',
+                    'iconUri' => null,
+                    'description' => 'Daftar log data sustainability (sensor)',
+                    'operations' => ['read'],
+                    'dataType' => [
+                        'typeName' => 'table',
+                        'columns' => [
+                            [
+                                'colIdx' => 0,
+                                'name' => 'Lokasi Sensor',
+                                'dataType' => ['typeName' => 'text']
+                            ],
+                            [
+                                'colIdx' => 1,
+                                'name' => 'Tipe',
+                                'dataType' => ['typeName' => 'text']
+                            ],
+                            [
+                                'colIdx' => 2,
+                                'name' => 'Baca',
+                                'dataType' => ['typeName' => 'number', 'unit' => null]
+                            ],
+                            [
+                                'colIdx' => 3,
+                                'name' => 'Status',
+                                'dataType' => ['typeName' => 'text']
+                            ],
+                            [
+                                'colIdx' => 4,
+                                'name' => 'Timestamp',
                                 'dataType' => ['typeName' => 'datetime']
                             ]
                         ]

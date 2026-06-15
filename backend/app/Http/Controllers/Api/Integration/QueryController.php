@@ -29,17 +29,20 @@ class QueryController extends Controller
 
         $results = [];
 
-        // In a real scenario, this would likely map 'code' to specific model methods.
-        // For our simplified implementation, we'll map codes back to paths and reuse DataController logic.
-        
         $codeToPathMap = [
-            '1f0ca001-0001-6000-8000-00000000bb01' => 'ringkasan/projek-aktif',
-            '1f0ca001-0001-6000-8000-00000000bb02' => 'ringkasan/avg-trl',
-            '1f0ca001-0001-6000-8000-00000000bb03' => 'ringkasan/energi-terbarukan',
+            '1f0ca001-0001-6000-8000-00000000bb01' => 'tracker-inovasi/projek-aktif',
+            '1f0ca001-0001-6000-8000-00000000bb02' => 'tracker-inovasi/avg-trl',
+            '1f0ca001-0001-6000-8000-00000000bb05' => 'tracker-inovasi/paten-tertunda',
+            '1f0ca001-0001-6000-8000-00000000bb06' => 'tracker-inovasi/kolaborasi',
+            '1f0ca001-0001-6000-8000-00000000bb03' => 'keberlanjutan/energi-terbarukan',
+            '1f0ca001-0001-6000-8000-00000000bb07' => 'keberlanjutan/green-performance',
+            '1f0ca001-0001-6000-8000-00000000bb08' => 'keberlanjutan/air-daur-ulang',
+            '1f0ca001-0001-6000-8000-00000000bb09' => 'keberlanjutan/metrik-limbah',
             '1f0ca001-0001-6000-8000-00000000bb04' => 'penelitian/aktif',
+            '1f0ca001-0001-6000-8000-00000000bc01' => 'keberlanjutan/dinamika-energi',
+            '1f0ca001-0001-6000-8000-00000000bc02' => 'keberlanjutan/sensor-feed',
         ];
 
-        // Instantiate DataController to reuse its show method logic
         $dataController = new DataController();
 
         foreach ($queries as $q) {
@@ -49,17 +52,14 @@ class QueryController extends Controller
             if (array_key_exists($code, $codeToPathMap)) {
                 $path = $codeToPathMap[$code];
                 
-                // Create a synthetic request with the params
                 $syntheticRequest = new Request($params);
                 
                 try {
                     $response = $dataController->show($syntheticRequest, $path);
-                    // The show method returns a JsonResponse. We extract its data.
                     if ($response->getStatusCode() === 200) {
                         $dataObj = json_decode($response->getContent(), true)['response'];
                         $results[] = $dataObj;
                     } else {
-                        // Forward the error structure
                         $errObj = json_decode($response->getContent(), true)['error'];
                         $results[] = [
                             'code' => $code,
