@@ -749,9 +749,11 @@ export default function ResearchModule() {
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-              Lo yakin mau hapus project{' '}
+              Hapus project{' '}
               <span className="font-semibold text-gray-900">"{showDeleteConfirm.title}"</span>?{' '}
-              Semua data terkait akan ikut terhapus permanen dari sistem.
+              Semua data terkait akan ikut
+              <span className="font-semibold text-gray-900"> terhapus permanen</span>?{' '}
+              dari sistem.
             </p>
             <div className="flex items-center gap-3">
               <button onClick={() => setShowDeleteConfirm(null)} disabled={deleteLoading}
