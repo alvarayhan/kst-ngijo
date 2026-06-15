@@ -94,3 +94,13 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     });
 });
+
+// ==========================================
+// INTEGRATION ENDPOINTS (Untuk Unified Dashboard / API Gateway)
+// ==========================================
+Route::prefix('integration')->group(function () {
+    Route::get('health', [\App\Http\Controllers\Api\Integration\HealthController::class, 'check']);
+    Route::get('contract', [\App\Http\Controllers\Api\Integration\ContractController::class, 'index']);
+    Route::get('data/{path}', [\App\Http\Controllers\Api\Integration\DataController::class, 'show'])->where('path', '.*');
+    Route::post('query', [\App\Http\Controllers\Api\Integration\QueryController::class, 'query']);
+});
