@@ -28,23 +28,18 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy project files
 COPY . /var/www/html/
 
-# Copy .env.example as base (Railway akan override via env vars)
-RUN cp .env.example .env
-
 # Install Laravel dependencies (no dev)
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+# Hapus .env fisik (kalo misal gak sengaja kesalin) biar Laravel MURNI baca OS Variables dari Railway
+RUN rm -f .env
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Generate APP_KEY dari .env.example (Railway akan override via env vars)
-RUN php artisan key:generate --force
-
-RUN php artisan jwt:secret --force
-
 # Expose port yang digunakan PHP built-in server
 EXPOSE 8080
 
-# Jalankan Laravel pake PHP built-in server (bye Apache!)
+# Jalankan Laravel pake PHP built-in server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
